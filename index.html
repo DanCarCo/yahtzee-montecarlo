@@ -7,12 +7,14 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+<!-- Toda la página va dentro de .wrap para que quede centrada y con ancho máximo -->
 <div class="wrap">
   <header class="top">
     <h1>🎲 Laboratorio Yahtzee · Montecarlo</h1>
     <p>Simulación del Yahtzee clásico para 2 jugadores y verificación de la Ley de los Grandes Números</p>
   </header>
 
+  <!-- Pestañas: app.js muestra solo el panel de la pestaña elegida -->
   <nav class="tabs" role="tablist" aria-label="Secciones">
     <button role="tab" id="tab-play" aria-selected="true" aria-controls="panel-play">Jugar</button>
     <button role="tab" id="tab-mc" aria-selected="false" aria-controls="panel-mc">Simulación Montecarlo</button>
@@ -21,6 +23,7 @@
 
   <!-- ===================================================== JUGAR -->
   <section class="panel" id="panel-play" role="tabpanel" aria-labelledby="tab-play">
+    <!-- Tarjeta superior: selección de jugadores, turno, dados y botón de lanzar -->
     <div class="card">
       <div class="controls">
         <label>Jugador 1
@@ -37,6 +40,7 @@
         <div class="meta" id="turnMeta"></div>
       </div>
 
+      <!-- Los dados y el mensaje de ayuda los dibuja app.js (renderGame) -->
       <div class="dice-row" id="diceRow" aria-label="Dados"></div>
       <p class="hint" id="hint"></p>
       <div class="actions">
@@ -44,11 +48,14 @@
       </div>
     </div>
 
+    <!-- Debajo: hoja de puntuación (izquierda) y estadísticas en vivo (derecha) -->
     <div class="grid-2">
       <div class="card">
         <h2>Hoja de puntuación</h2>
         <p class="lead small" style="margin-bottom:8px">Cuando lances, aparece en cursiva lo que sumaría cada casilla. Haz clic en la casilla elegida.</p>
+        <!-- La tabla se llena desde app.js (renderScoreTable) -->
         <table class="score" id="scoreTable"></table>
+        <!-- Aviso de la regla del comodín (solo aparece cuando sale un Yahtzee extra) -->
         <div class="notice" id="jokerNotice" hidden></div>
       </div>
 
@@ -78,10 +85,12 @@
         <label>Semilla (opcional)<input type="text" id="seed1" placeholder="aleatoria" size="10"></label>
         <button class="btn" id="run1">Ejecutar</button>
       </div>
+      <!-- Barra de progreso de la simulación -->
       <div class="progress"><i id="prog1"></i></div>
       <div class="grid-2">
         <div>
           <div class="legend"><span><i style="background:var(--series-1)"></i>Media acumulada</span><span><i class="dash"></i>E[X] = 3,5</span><span><i style="background:var(--series-1);opacity:.3"></i>Banda teórica 95 %</span></div>
+          <!-- Los gráficos se dibujan en canvas con charts.js -->
           <canvas class="chart" id="c1a" aria-label="Convergencia de la media del dado"></canvas>
         </div>
         <div>
@@ -102,6 +111,7 @@
         <button class="btn" id="run2">Ejecutar</button>
       </div>
       <div class="progress"><i id="prog2"></i></div>
+      <!-- tabla comparativa teórica vs simulada; app.js llena el tbody -->
       <table class="data" id="t2"><thead><tr><th>Combinación</th><th>Teórica</th><th>Simulada</th><th>Error abs.</th><th>± IC 95 %</th><th>¿Dentro del IC?</th></tr></thead><tbody></tbody></table>
       <div class="controls">
         <label>Ver convergencia de
@@ -209,6 +219,7 @@
   </div>
 </div>
 
+<!-- Orden importante: engine.js y charts.js primero porque app.js los usa -->
 <script src="js/engine.js"></script>
 <script src="js/charts.js"></script>
 <script src="js/app.js"></script>
