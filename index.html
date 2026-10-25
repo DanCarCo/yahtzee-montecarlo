@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio Yahtzee Montecarlo</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>🎲 Laboratorio Yahtzee · Montecarlo</h1>
+    <p>Simulación del Yahtzee clásico para 2 jugadores y verificación de la Ley de los Grandes Números</p>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Secciones">
+    <button role="tab" id="tab-play" aria-selected="true" aria-controls="panel-play">Jugar</button>
+    <button role="tab" id="tab-mc" aria-selected="false" aria-controls="panel-mc">Simulación Montecarlo</button>
+    <button role="tab" id="tab-method" aria-selected="false" aria-controls="panel-method">Metodología</button>
+  </nav>
+
+  <!-- ===================================================== JUGAR -->
+  <section class="panel" id="panel-play" role="tabpanel" aria-labelledby="tab-play">
+    <div class="card">
+      <div class="controls">
+        <label>Jugador 1
+          <select id="p1type"><option value="human">Humano</option><option value="computer">Computadora</option></select>
+        </label>
+        <label>Jugador 2
+          <select id="p2type"><option value="human">Humano</option><option value="computer">Computadora</option></select>
+        </label>
+        <button class="btn" id="newGame">Nuevo juego</button>
+      </div>
+
+      <div class="status">
+        <div class="turn" id="turnText">Turno</div>
+        <div class="meta" id="turnMeta"></div>
+      </div>
+
+      <div class="dice-row" id="diceRow" aria-label="Dados"></div>
+      <p class="hint" id="hint"></p>
+      <div class="actions">
+        <button class="btn" id="rollBtn">🎲 Lanzar dados</button>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h2>Hoja de puntuación</h2>
+        <p class="lead small" style="margin-bottom:8px">Cuando lances, aparece en cursiva lo que sumaría cada casilla. Haz clic en la casilla elegida.</p>
+        <table class="score" id="scoreTable"></table>
+        <div class="notice" id="jokerNotice" hidden></div>
+      </div>
+
+      <div class="card">
+        <h2>Estadísticas en vivo</h2>
+        <p class="lead small">Solo se registran los dados <strong>recién lanzados</strong> (los retenidos no se vuelven a contar), de modo que cada dato es una muestra independiente de la uniforme discreta.</p>
+        <div id="liveFreq"></div>
+        <div class="kv" id="liveKv"></div>
+        <p class="muted small" style="margin-bottom:0">La línea vertical marca la frecuencia teórica 1/6. Para ver la convergencia con muchos datos usa la pestaña «Simulación Montecarlo».</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================== MONTECARLO -->
+  <section class="panel" id="panel-mc" role="tabpanel" aria-labelledby="tab-mc" hidden>
+    <div class="card">
+      <h2>Método de Montecarlo: de las frecuencias a las probabilidades</h2>
+      <p class="lead">Cada experimento repite el azar muchas veces y compara lo observado con el valor teórico exacto. Con una <strong>semilla</strong> fija el resultado es reproducible; déjala vacía para obtener una corrida distinta cada vez.</p>
+    </div>
+
+    <!-- Experimento 1 -->
+    <div class="card" id="exp1">
+      <h2>Experimento 1 · Un dado: la media muestral converge a 3,5</h2>
+      <p class="lead">Se lanzan N dados. La media acumulada debería acercarse a E[X] = 3,5 y la frecuencia de cada cara a 1/6. La banda sombreada es ±1,96·σ/√n (σ = 1,708): el 95 % de las corridas deben quedar dentro.</p>
+      <div class="controls">
+        <label>Lanzamientos (N)<input type="number" id="n1" value="100000" min="10" max="5000000" step="10000"></label>
+        <label>Semilla (opcional)<input type="text" id="seed1" placeholder="aleatoria" size="10"></label>
+        <button class="btn" id="run1">Ejecutar</button>
+      </div>
+      <div class="progress"><i id="prog1"></i></div>
+      <div class="grid-2">
+        <div>
+          <div class="legend"><span><i style="background:var(--series-1)"></i>Media acumulada</span><span><i class="dash"></i>E[X] = 3,5</span><span><i style="background:var(--series-1);opacity:.3"></i>Banda teórica 95 %</span></div>
+          <canvas class="chart" id="c1a" aria-label="Convergencia de la media del dado"></canvas>
+        </div>
+        <div>
+          <div class="legend"><span><i style="background:var(--series-1)"></i>Frecuencia relativa observada</span><span><i class="dash"></i>1/6</span></div>
+          <canvas class="chart" id="c1b" aria-label="Frecuencia relativa de cada cara"></canvas>
+        </div>
+      </div>
+      <div class="result" id="r1" hidden></div>
+    </div>
+
+    <!-- Experimento 2 -->
+    <div class="card" id="exp2">
+      <h2>Experimento 2 · Combinaciones en una tirada de 5 dados</h2>
+      <p class="lead">La probabilidad teórica se obtiene enumerando los 6⁵ = 7 776 resultados. La simulación estima la misma cantidad con frecuencias relativas.</p>
+      <div class="controls">
+        <label>Tiradas (N)<input type="number" id="n2" value="200000" min="100" max="5000000" step="10000"></label>
+        <label>Semilla (opcional)<input type="text" id="seed2" placeholder="aleatoria" size="10"></label>
+        <button class="btn" id="run2">Ejecutar</button>
+      </div>
+      <div class="progress"><i id="prog2"></i></div>
+      <table class="data" id="t2"><thead><tr><th>Combinación</th><th>Teórica</th><th>Simulada</th><th>Error abs.</th><th>± IC 95 %</th><th>¿Dentro del IC?</th></tr></thead><tbody></tbody></table>
+      <div class="controls">
+        <label>Ver convergencia de
+          <select id="sel2"></select>
+        </label>
+      </div>
+      <div class="legend"><span><i style="background:var(--series-1)"></i>Frecuencia relativa acumulada</span><span><i class="dash"></i>Probabilidad teórica</span></div>
+      <canvas class="chart" id="c2" aria-label="Convergencia de la frecuencia de la combinación"></canvas>
+      <div class="result" id="r2" hidden></div>
+    </div>
+
+    <!-- Experimento 3 -->
+    <div class="card" id="exp3">
+      <h2>Experimento 3 · Yahtzee en un turno completo (3 tiradas)</h2>
+      <p class="lead">Se simulan N turnos reteniendo siempre la cara más repetida. La probabilidad teórica se calcula exactamente por programación dinámica (≈ 4,6 %). Es un evento raro: se necesita un N grande para que la frecuencia se estabilice.</p>
+      <div class="controls">
+        <label>Turnos (N)<input type="number" id="n3" value="200000" min="100" max="3000000" step="10000"></label>
+        <label>Semilla (opcional)<input type="text" id="seed3" placeholder="aleatoria" size="10"></label>
+        <button class="btn" id="run3">Ejecutar</button>
+      </div>
+      <div class="progress"><i id="prog3"></i></div>
+      <div class="legend"><span><i style="background:var(--series-1)"></i>Frecuencia relativa acumulada</span><span><i class="dash"></i>Probabilidad exacta</span><span><i style="background:var(--series-1);opacity:.3"></i>Banda teórica 95 %</span></div>
+      <canvas class="chart" id="c3" aria-label="Convergencia de la probabilidad de Yahtzee en un turno"></canvas>
+      <div class="result" id="r3" hidden></div>
+    </div>
+
+    <!-- Experimento 4 -->
+    <div class="card" id="exp4">
+      <h2>Experimento 4 · Partidas completas de 2 jugadores</h2>
+      <p class="lead">Se simulan M partidas de 13 rondas entre dos computadoras, con las reglas completas (bono superior, Yahtzee extra, comodín). Como ambas deciden igual, la ventaja de empezar primero debe tender a cero y cada una a ganar ≈ la mitad de las partidas no empatadas.</p>
+      <div class="controls">
+        <label>Partidas (M)<input type="number" id="n4" value="5000" min="10" max="200000" step="1000"></label>
+        <label>Semilla (opcional)<input type="text" id="seed4" placeholder="aleatoria" size="10"></label>
+        <button class="btn" id="run4">Ejecutar</button>
+      </div>
+      <div class="progress"><i id="prog4"></i></div>
+      <table class="data" id="t4"><thead><tr><th>Jugador</th><th>Puntaje medio</th><th>Desv. est.</th><th>± IC 95 %</th><th>Mín – Máx</th><th>Victorias</th><th>Yahtzees/partida</th></tr></thead><tbody></tbody></table>
+      <div class="grid-2">
+        <div>
+          <div class="legend"><span><i style="background:var(--series-1)"></i>Distribución del puntaje del Jugador 1 (frecuencia relativa)</span></div>
+          <canvas class="chart" id="c4a" aria-label="Histograma de puntajes del jugador 1"></canvas>
+        </div>
+        <div>
+          <div class="legend"><span><i style="background:var(--series-1)"></i>Jugador 1</span><span><i style="background:var(--series-2)"></i>Jugador 2</span><span><i style="background:var(--series-1);opacity:.3"></i>Banda IC 95 % (J1)</span></div>
+          <canvas class="chart" id="c4b" aria-label="Convergencia del puntaje medio"></canvas>
+        </div>
+      </div>
+      <div class="result" id="r4" hidden></div>
+    </div>
+  </section>
+
+  <!-- ===================================================== METODOLOGÍA -->
+  <section class="panel" id="panel-method" role="tabpanel" aria-labelledby="tab-method" hidden>
+    <div class="card">
+      <h2>Modelo probabilístico</h2>
+      <p>Cada dado es una variable aleatoria uniforme discreta, y los cinco dados y las tiradas sucesivas son independientes:</p>
+      <div class="formula">P(X = k) = 1/6, k ∈ {1,…,6} &nbsp;·&nbsp; E[X] = 3,5 &nbsp;·&nbsp; Var(X) = 35/12 ≈ 2,917 &nbsp;·&nbsp; σ ≈ 1,708</div>
+      <p>Se genera <code>U ~ U[0,1)</code> con un PRNG (<em>mulberry32</em> con semilla, o <code>Math.random()</code> en el juego interactivo) y se transforma con <code>⌊6·U⌋ + 1</code>.</p>
+      <h3>Ley de los Grandes Números</h3>
+      <div class="formula">X̄ₙ = (X₁ + … + Xₙ)/n → E[X] &nbsp; cuando n → ∞ &nbsp;&nbsp;|&nbsp;&nbsp; error típico ≈ σ/√n</div>
+      <p>Lo mismo ocurre con las frecuencias relativas: <em>f<sub>n</sub>(A) → P(A)</em>. Los experimentos 1–3 lo muestran con la banda ±1,96·σ/√n; el experimento 4 lo aplica al puntaje de una partida completa, donde no hay fórmula cerrada y Montecarlo es la herramienta natural.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h2>Reglas implementadas</h2>
+        <table class="data">
+          <thead><tr><th>Casilla</th><th>Puntos</th></tr></thead>
+          <tbody>
+            <tr><td>Unos … Seises</td><td>suma de los dados de esa cara</td></tr>
+            <tr><td>Bono superior</td><td>+35 si la sección superior suma ≥ 63</td></tr>
+            <tr><td>Tercia / Póker</td><td>suma de los 5 dados (≥3 / ≥4 iguales)</td></tr>
+            <tr><td>Full House</td><td>25 (3 + 2)</td></tr>
+            <tr><td>Escalera pequeña</td><td>30 (4 seguidos)</td></tr>
+            <tr><td>Escalera grande</td><td>40 (5 seguidos)</td></tr>
+            <tr><td>Yahtzee</td><td>50 (5 iguales)</td></tr>
+            <tr><td>Suerte</td><td>suma de los 5 dados</td></tr>
+            <tr><td>Yahtzee extra</td><td>+100 si la casilla Yahtzee tiene 50</td></tr>
+          </tbody>
+        </table>
+        <p class="small muted">Comodín: con un Yahtzee extra se debe usar la casilla superior de ese número si está libre; si no, cualquier casilla inferior libre (Full House y escaleras puntúan completo); si no, una superior con 0.</p>
+      </div>
+      <div class="card">
+        <h2>Jugador computadora</h2>
+        <p>La computadora no juega al azar: conserva combinaciones ya hechas (Yahtzee, Full House, escalera), persigue una escalera si hay 4 caras seguidas y, si no, retiene la cara más repetida. Al anotar elige la casilla que maximiza <em>puntos − valor típico de la casilla</em>, sacrificando primero las casillas baratas. El azar solo está en los dados.</p>
+        <h2 style="margin-top:18px">Estructura del código</h2>
+        <ul class="small">
+          <li><code>js/engine.js</code> – reglas, PRNG, estrategias, probabilidades exactas y estadística.</li>
+          <li><code>js/app.js</code> – interfaz del juego y experimentos.</li>
+          <li><code>js/charts.js</code> – gráficos en canvas.</li>
+          <li><code>tests/engine.test.js</code> – pruebas del motor.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="modal-bg" id="modalBg" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle">Juego terminado</h2>
+    <div class="scores" id="modalScores"></div>
+    <div class="actions">
+      <button class="btn secondary" id="modalClose">Ver hoja</button>
+      <button class="btn" id="modalNew">Nuevo juego</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/engine.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
