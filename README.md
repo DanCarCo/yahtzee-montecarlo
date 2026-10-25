@@ -52,3 +52,10 @@ guia_original/             Archivos de partida (HTML y React) sin modificar
 | **USA** | Se ejecutó y analizó la guía (`guia_original/`). Se detectó que el HTML estaba truncado (terminaba a mitad de `resetGame()`, sin `initGame()` ni cierre de etiquetas) y que la versión React nunca terminaba la partida. |
 | **MODIFICA** | Se corrigieron los errores y se completaron las reglas: fin de partida (el chequeo usaba el estado anterior a la última jugada); estadísticas solo con dados recién lanzados (la guía contaba varias veces los dados retenidos → muestras no independientes); tabla de probabilidades (escalera pequeña es 15,43 %, no 12,35 %); bono superior, Yahtzee extra y comodín. |
 | **CREA** | Motor reutilizable en navegador y Node, PRNG con semilla, interfaz rediseñada (rojo, negro y dorado) con tooltips en los gráficos, 4 experimentos Montecarlo, probabilidades exactas, jugador computadora, estadística en línea (Welford), pruebas unitarias. |
+
+## Uso de inteligencia artificial
+
+Este proyecto se desarrolló con asistencia de **Claude** (Anthropic, modelo Claude Sonnet 5.5), usado a través de Claude Code.
+
+- **Rediseño visual:** fue **coautorado por Claude**. Incluye el cambio de diseño, la paleta roja, negra y dorada, los iconos SVG (`js/icons.js`), los efectos de confeti y avisos (`js/fx.js`), los tooltips de los gráficos (`js/charts.js`) y los ajustes de `css/styles.css`, `index.html` y `js/app.js`.
+- La revisión, la ejecución de las pruebas y la decisión de qué entregar son responsabilidad de las personas autoras del repositorio.
