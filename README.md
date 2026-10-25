@@ -5,7 +5,10 @@ Actividad didáctica 2-M1.
 
 ## Cómo ejecutarlo
 
-**Aplicación (juego + experimentos):** abrir [`index.html`](index.html) con doble clic en cualquier navegador moderno. No requiere instalación, servidor ni conexión a internet.
+**Aplicación (juego + experimentos)**, a elegir una de estas dos opciones:
+
+- **En línea:** abrir <https://dancarco.github.io/yahtzee-montecarlo/> en cualquier navegador moderno.
+- **Local:** descargar o clonar el repositorio y abrir [`index.html`](index.html) con doble clic. No requiere instalación, servidor ni conexión a internet.
 
 **Pruebas del motor** (requiere [Node.js](https://nodejs.org) 18+):
 
