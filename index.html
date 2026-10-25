@@ -4,26 +4,44 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Laboratorio Yahtzee Montecarlo</title>
+  <!-- Fuentes de Google (Playfair Display para títulos, Inter para el texto).
+       Si no hay internet, el navegador usa Georgia y la fuente del sistema, y se ve bien igual. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<!-- Toda la página va dentro de .wrap para que quede centrada y con ancho máximo -->
+
+<!-- ===================================================== PORTADA -->
+<header class="hero">
+  <!-- Dados decorativos flotantes (los dibuja app.js) -->
+  <div class="hero-dice" id="heroDice" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <p class="eyebrow">Actividad didáctica 2-M1 · Método de Montecarlo</p>
+    <h1>Laboratorio <em>Yahtzee</em></h1>
+    <hr class="rule">
+    <p class="sub">Simulación del Yahtzee clásico para 2 jugadores y verificación de la Ley de los Grandes Números con miles de partidas.</p>
+    <div class="hero-actions">
+      <button class="btn gold" id="heroPlay"><span class="ico" data-icon="dice"></span> Jugar ahora</button>
+      <button class="btn secondary" id="heroSim"><span class="ico" data-icon="chart"></span> Ver simulación</button>
+    </div>
+  </div>
+</header>
+
+<!-- Todo el contenido va dentro de .wrap para que quede centrado y con ancho máximo -->
 <div class="wrap">
-  <header class="top">
-    <h1>🎲 Laboratorio Yahtzee · Montecarlo</h1>
-    <p>Simulación del Yahtzee clásico para 2 jugadores y verificación de la Ley de los Grandes Números</p>
-  </header>
 
   <!-- Pestañas: app.js muestra solo el panel de la pestaña elegida -->
   <nav class="tabs" role="tablist" aria-label="Secciones">
-    <button role="tab" id="tab-play" aria-selected="true" aria-controls="panel-play">Jugar</button>
-    <button role="tab" id="tab-mc" aria-selected="false" aria-controls="panel-mc">Simulación Montecarlo</button>
-    <button role="tab" id="tab-method" aria-selected="false" aria-controls="panel-method">Metodología</button>
+    <button role="tab" id="tab-play" aria-selected="true" aria-controls="panel-play"><span class="ico" data-icon="dice"></span> Jugar</button>
+    <button role="tab" id="tab-mc" aria-selected="false" aria-controls="panel-mc"><span class="ico" data-icon="flask"></span> Simulación Montecarlo</button>
+    <button role="tab" id="tab-method" aria-selected="false" aria-controls="panel-method"><span class="ico" data-icon="book"></span> Metodología</button>
   </nav>
 
   <!-- ===================================================== JUGAR -->
   <section class="panel" id="panel-play" role="tabpanel" aria-labelledby="tab-play">
-    <!-- Tarjeta superior: selección de jugadores, turno, dados y botón de lanzar -->
+    <!-- Tarjeta superior: selección de jugadores, marcadores, turno y mesa con los dados -->
     <div class="card">
       <div class="controls">
         <label>Jugador 1
@@ -32,26 +50,32 @@
         <label>Jugador 2
           <select id="p2type"><option value="human">Humano</option><option value="computer">Computadora</option></select>
         </label>
-        <button class="btn" id="newGame">Nuevo juego</button>
+        <button class="btn" id="newGame"><span class="ico" data-icon="play" data-size="16"></span> Nuevo juego</button>
       </div>
+
+      <!-- Marcadores de los dos jugadores; el que está en turno se resalta (app.js: renderPlayers) -->
+      <div class="players" id="players"></div>
 
       <div class="status">
         <div class="turn" id="turnText">Turno</div>
         <div class="meta" id="turnMeta"></div>
       </div>
 
-      <!-- Los dados y el mensaje de ayuda los dibuja app.js (renderGame) -->
-      <div class="dice-row" id="diceRow" aria-label="Dados"></div>
-      <p class="hint" id="hint"></p>
-      <div class="actions">
-        <button class="btn" id="rollBtn">🎲 Lanzar dados</button>
+      <!-- La "mesa" de fieltro donde caen los dados -->
+      <div class="felt">
+        <!-- Los dados y el mensaje de ayuda los dibuja app.js (renderGame) -->
+        <div class="dice-row" id="diceRow" aria-label="Dados"></div>
+        <p class="hint" id="hint"></p>
+        <div class="actions">
+          <button class="btn gold" id="rollBtn">Lanzar dados</button>
+        </div>
       </div>
     </div>
 
     <!-- Debajo: hoja de puntuación (izquierda) y estadísticas en vivo (derecha) -->
     <div class="grid-2">
       <div class="card">
-        <h2>Hoja de puntuación</h2>
+        <h2><span class="ico" data-icon="hash"></span> Hoja de puntuación</h2>
         <p class="lead small" style="margin-bottom:8px">Cuando lances, aparece en cursiva lo que sumaría cada casilla. Haz clic en la casilla elegida.</p>
         <!-- La tabla se llena desde app.js (renderScoreTable) -->
         <table class="score" id="scoreTable"></table>
@@ -60,11 +84,11 @@
       </div>
 
       <div class="card">
-        <h2>Estadísticas en vivo</h2>
+        <h2><span class="ico" data-icon="chart"></span> Estadísticas en vivo</h2>
         <p class="lead small">Solo se registran los dados <strong>recién lanzados</strong> (los retenidos no se vuelven a contar), de modo que cada dato es una muestra independiente de la uniforme discreta.</p>
         <div id="liveFreq"></div>
-        <div class="kv" id="liveKv"></div>
-        <p class="muted small" style="margin-bottom:0">La línea vertical marca la frecuencia teórica 1/6. Para ver la convergencia con muchos datos usa la pestaña «Simulación Montecarlo».</p>
+        <div class="tiles" id="liveKv"></div>
+        <p class="muted small" style="margin-bottom:0">La marca vertical dorada indica la frecuencia teórica 1/6. Para ver la convergencia con muchos datos usa la pestaña «Simulación Montecarlo».</p>
       </div>
     </div>
   </section>
@@ -72,13 +96,13 @@
   <!-- ===================================================== MONTECARLO -->
   <section class="panel" id="panel-mc" role="tabpanel" aria-labelledby="tab-mc" hidden>
     <div class="card">
-      <h2>Método de Montecarlo: de las frecuencias a las probabilidades</h2>
-      <p class="lead">Cada experimento repite el azar muchas veces y compara lo observado con el valor teórico exacto. Con una <strong>semilla</strong> fija el resultado es reproducible; déjala vacía para obtener una corrida distinta cada vez.</p>
+      <h2><span class="ico" data-icon="flask"></span> Método de Montecarlo: de las frecuencias a las probabilidades</h2>
+      <p class="lead" style="margin-bottom:0">Cada experimento repite el azar muchas veces y compara lo observado con el valor teórico exacto. Con una <strong>semilla</strong> fija el resultado es reproducible; déjala vacía para obtener una corrida distinta cada vez. Pasa el mouse sobre los gráficos para ver los valores exactos.</p>
     </div>
 
     <!-- Experimento 1 -->
     <div class="card" id="exp1">
-      <h2>Experimento 1 · Un dado: la media muestral converge a 3,5</h2>
+      <h2><span class="ico" data-icon="dice"></span> Experimento 1 · Un dado: la media muestral converge a 3,5</h2>
       <p class="lead">Se lanzan N dados. La media acumulada debería acercarse a E[X] = 3,5 y la frecuencia de cada cara a 1/6. La banda sombreada es ±1,96·σ/√n (σ = 1,708): el 95 % de las corridas deben quedar dentro.</p>
       <div class="controls">
         <label>Lanzamientos (N)<input type="number" id="n1" value="100000" min="10" max="5000000" step="10000"></label>
@@ -103,7 +127,7 @@
 
     <!-- Experimento 2 -->
     <div class="card" id="exp2">
-      <h2>Experimento 2 · Combinaciones en una tirada de 5 dados</h2>
+      <h2><span class="ico" data-icon="percent"></span> Experimento 2 · Combinaciones en una tirada de 5 dados</h2>
       <p class="lead">La probabilidad teórica se obtiene enumerando los 6⁵ = 7 776 resultados. La simulación estima la misma cantidad con frecuencias relativas.</p>
       <div class="controls">
         <label>Tiradas (N)<input type="number" id="n2" value="200000" min="100" max="5000000" step="10000"></label>
@@ -125,7 +149,7 @@
 
     <!-- Experimento 3 -->
     <div class="card" id="exp3">
-      <h2>Experimento 3 · Yahtzee en un turno completo (3 tiradas)</h2>
+      <h2><span class="ico" data-icon="target"></span> Experimento 3 · Yahtzee en un turno completo (3 tiradas)</h2>
       <p class="lead">Se simulan N turnos reteniendo siempre la cara más repetida. La probabilidad teórica se calcula exactamente por programación dinámica (≈ 4,6 %). Es un evento raro: se necesita un N grande para que la frecuencia se estabilice.</p>
       <div class="controls">
         <label>Turnos (N)<input type="number" id="n3" value="200000" min="100" max="3000000" step="10000"></label>
@@ -140,7 +164,7 @@
 
     <!-- Experimento 4 -->
     <div class="card" id="exp4">
-      <h2>Experimento 4 · Partidas completas de 2 jugadores</h2>
+      <h2><span class="ico" data-icon="trophy"></span> Experimento 4 · Partidas completas de 2 jugadores</h2>
       <p class="lead">Se simulan M partidas de 13 rondas entre dos computadoras, con las reglas completas (bono superior, Yahtzee extra, comodín). Como ambas deciden igual, la ventaja de empezar primero debe tender a cero y cada una a ganar ≈ la mitad de las partidas no empatadas.</p>
       <div class="controls">
         <label>Partidas (M)<input type="number" id="n4" value="5000" min="10" max="200000" step="1000"></label>
@@ -166,7 +190,7 @@
   <!-- ===================================================== METODOLOGÍA -->
   <section class="panel" id="panel-method" role="tabpanel" aria-labelledby="tab-method" hidden>
     <div class="card">
-      <h2>Modelo probabilístico</h2>
+      <h2><span class="ico" data-icon="sigma"></span> Modelo probabilístico</h2>
       <p>Cada dado es una variable aleatoria uniforme discreta, y los cinco dados y las tiradas sucesivas son independientes:</p>
       <div class="formula">P(X = k) = 1/6, k ∈ {1,…,6} &nbsp;·&nbsp; E[X] = 3,5 &nbsp;·&nbsp; Var(X) = 35/12 ≈ 2,917 &nbsp;·&nbsp; σ ≈ 1,708</div>
       <p>Se genera <code>U ~ U[0,1)</code> con un PRNG (<em>mulberry32</em> con semilla, o <code>Math.random()</code> en el juego interactivo) y se transforma con <code>⌊6·U⌋ + 1</code>.</p>
@@ -176,7 +200,7 @@
     </div>
     <div class="grid-2">
       <div class="card">
-        <h2>Reglas implementadas</h2>
+        <h2><span class="ico" data-icon="check"></span> Reglas implementadas</h2>
         <table class="data">
           <thead><tr><th>Casilla</th><th>Puntos</th></tr></thead>
           <tbody>
@@ -194,13 +218,13 @@
         <p class="small muted">Comodín: con un Yahtzee extra se debe usar la casilla superior de ese número si está libre; si no, cualquier casilla inferior libre (Full House y escaleras puntúan completo); si no, una superior con 0.</p>
       </div>
       <div class="card">
-        <h2>Jugador computadora</h2>
+        <h2><span class="ico" data-icon="bot"></span> Jugador computadora</h2>
         <p>La computadora no juega al azar: conserva combinaciones ya hechas (Yahtzee, Full House, escalera), persigue una escalera si hay 4 caras seguidas y, si no, retiene la cara más repetida. Al anotar elige la casilla que maximiza <em>puntos − valor típico de la casilla</em>, sacrificando primero las casillas baratas. El azar solo está en los dados.</p>
-        <h2 style="margin-top:18px">Estructura del código</h2>
+        <h2 style="margin-top:18px"><span class="ico" data-icon="book"></span> Estructura del código</h2>
         <ul class="small">
-          <li><code>js/engine.js</code> – reglas, PRNG, estrategias, probabilidades exactas y estadística.</li>
+          <li><code>js/engine.js</code> – reglas, PRNG, jugador computadora, probabilidades exactas y estadística.</li>
           <li><code>js/app.js</code> – interfaz del juego y experimentos.</li>
-          <li><code>js/charts.js</code> – gráficos en canvas.</li>
+          <li><code>js/charts.js</code>, <code>js/icons.js</code>, <code>js/fx.js</code> – gráficos, iconos y efectos visuales.</li>
           <li><code>tests/engine.test.js</code> – pruebas del motor.</li>
         </ul>
       </div>
@@ -208,8 +232,14 @@
   </section>
 </div>
 
+<footer class="foot">
+  <b>Laboratorio Yahtzee</b> · Método de Montecarlo · Ley de los Grandes Números
+</footer>
+
+<!-- Ventana final de la partida -->
 <div class="modal-bg" id="modalBg" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="trophy" data-icon="trophy" data-size="48"></div>
     <h2 id="modalTitle">Juego terminado</h2>
     <div class="scores" id="modalScores"></div>
     <div class="actions">
@@ -219,8 +249,10 @@
   </div>
 </div>
 
-<!-- Orden importante: engine.js y charts.js primero porque app.js los usa -->
+<!-- Orden importante: los módulos primero porque app.js los usa -->
 <script src="js/engine.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/fx.js"></script>
 <script src="js/charts.js"></script>
 <script src="js/app.js"></script>
 </body>

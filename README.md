@@ -38,8 +38,10 @@ index.html                 Aplicación
 css/styles.css             Estilos (modo claro/oscuro)
 js/engine.js               Reglas, PRNG con semilla, jugador computadora, probabilidades exactas, estadística
 js/app.js                  Interfaz del juego y de los experimentos
-js/charts.js               Gráficos en canvas (sin librerías externas)
-tests/engine.test.js       13 pruebas del motor
+js/charts.js               Gráficos en canvas con tooltip (sin librerías externas)
+js/icons.js                Iconos SVG propios
+js/fx.js                   Efectos: confeti y avisos
+tests/engine.test.js       14 pruebas del motor
 guia_original/             Archivos de partida (HTML y React) sin modificar
 ```
 
@@ -49,4 +51,4 @@ guia_original/             Archivos de partida (HTML y React) sin modificar
 |---|---|
 | **USA** | Se ejecutó y analizó la guía (`guia_original/`). Se detectó que el HTML estaba truncado (terminaba a mitad de `resetGame()`, sin `initGame()` ni cierre de etiquetas) y que la versión React nunca terminaba la partida. |
 | **MODIFICA** | Se corrigieron los errores y se completaron las reglas: fin de partida (el chequeo usaba el estado anterior a la última jugada); estadísticas solo con dados recién lanzados (la guía contaba varias veces los dados retenidos → muestras no independientes); tabla de probabilidades (escalera pequeña es 15,43 %, no 12,35 %); bono superior, Yahtzee extra y comodín. |
-| **CREA** | Motor reutilizable en navegador y Node, PRNG con semilla, 4 experimentos Montecarlo, probabilidades exactas, jugador computadora, estadística en línea (Welford), pruebas unitarias. |
+| **CREA** | Motor reutilizable en navegador y Node, PRNG con semilla, interfaz rediseñada (rojo, negro y dorado) con tooltips en los gráficos, 4 experimentos Montecarlo, probabilidades exactas, jugador computadora, estadística en línea (Welford), pruebas unitarias. |
